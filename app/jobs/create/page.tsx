@@ -9,12 +9,34 @@ export default function CreateJobPage() {
     // or just standard form action if we don't need complex error handling, 
     // but we usually do.
     const [submitting, setSubmitting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setSubmitting(true)
+        setError(null)
+
+        const formData = new FormData(e.currentTarget)
+        const result = await createJob(formData)
+
+        setSubmitting(false)
+
+        if (result?.error) {
+            setError(result.error)
+        }
+    }
 
     return (
         <main className="max-w-2xl mx-auto p-6">
             <h1 className="text-2xl font-bold text-[#4a4a4a] mb-6">求人を掲載する</h1>
 
-            <form action={createJob} className="bg-white p-8 rounded-lg shadow-sm space-y-6">
+            {error && (
+                <div className="bg-red-50 text-red-600 p-4 rounded mb-6 text-sm">
+                    {error}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-sm space-y-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">求人タイトル</label>
                     <input
@@ -63,18 +85,17 @@ export default function CreateJobPage() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">求人画像（任意）</label>
                     <ImageUpload
-                        onUpload={() => { }} // State handled by hidden input within component but for server action we rely on the hidden input 'image_url' which ImageUpload component should generate or we manage it here.
-                    // Actually ImageUpload component in previous step had <input type="hidden" name="image_url" ... /> 
-                    // So we just need to render it.
+                        onUpload={() => { }}
                     />
                 </div>
 
                 <div className="pt-4">
                     <button
                         type="submit"
-                        className="w-full bg-[#8d6e63] text-white font-bold py-3 rounded hover:bg-[#6d4c41] transition-colors"
+                        disabled={submitting}
+                        className="w-full bg-[#8d6e63] text-white font-bold py-3 rounded hover:bg-[#6d4c41] transition-colors disabled:opacity-50"
                     >
-                        求人を公開する
+                        {submitting ? '送信中...' : '求人を公開する'}
                     </button>
                 </div>
             </form>
