@@ -1,65 +1,103 @@
-import Image from "next/image";
+import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import { ja } from "date-fns/locale";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  // Fetch latest 3 jobs
+  const { data: latestJobs } = await supabase
+    .from("jobs")
+    .select("*, profiles(display_name)")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen">
+      {/* ヒーローセクション */}
+      <section className="bg-[#8d6e63] text-white py-20 px-6 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          未知なる世界を、<br />その手で掘り起こそう。
+        </h1>
+        <p className="text-lg md:text-xl mb-10 opacity-90 max-w-2xl mx-auto">
+          「発掘Mate」は、世界中の遺跡発掘プロジェクトと、<br />
+          情熱あるあなたを繋ぐプラットフォームです。
+        </p>
+        <div className="flex flex-col md:flex-row gap-4 justify-center">
+          <Link href="/jobs" className="bg-white text-[#8d6e63] px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
+            求人を探す
+          </Link>
+          <Link href="/auth" className="border-2 border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-[#8d6e63] transition-colors">
+            メンバー登録 (無料)
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* メインコンテンツ */}
+      <main className="max-w-5xl mx-auto p-6 py-16">
+
+        {/* Features */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20 text-center">
+          <div className="p-6 bg-white rounded-xl shadow-sm border border-stone-100">
+            <div className="text-4xl mb-4">🏺</div>
+            <h3 className="text-xl font-bold text-[#4a4a4a] mb-2">多種多様な求人</h3>
+            <p className="text-gray-500">エジプトのピラミッドから、南米のジャングルまで。世界中の発掘現場があなたを待っています。</p>
+          </div>
+          <div className="p-6 bg-white rounded-xl shadow-sm border border-stone-100">
+            <div className="text-4xl mb-4">📚</div>
+            <h3 className="text-xl font-bold text-[#4a4a4a] mb-2">学びの広場</h3>
+            <p className="text-gray-500">経験者の体験談や、専門知識を共有できるコミュニティ。現場に出る前の予習に最適です。</p>
+          </div>
+          <div className="p-6 bg-white rounded-xl shadow-sm border border-stone-100">
+            <div className="text-4xl mb-4">🛡️</div>
+            <h3 className="text-xl font-bold text-[#4a4a4a] mb-2">安心のサポート</h3>
+            <p className="text-gray-500">プロフィールを充実させて、リクルーターからのスカウトを待つことも可能です。</p>
+          </div>
         </div>
+
+        {/* New Jobs */}
+        <section className="mb-10">
+          <div className="flex justify-between items-end mb-6">
+            <h2 className="text-2xl font-bold text-[#4a4a4a]">新着の求人</h2>
+            <Link href="/jobs" className="text-[#8d6e63] font-bold hover:underline">すべて見る →</Link>
+          </div>
+
+          <div className="grid gap-6">
+            {latestJobs && latestJobs.length > 0 ? (
+              latestJobs.map((job) => (
+                <Link href={`/jobs/${job.id}`} key={job.id} className="bg-white p-6 rounded-lg shadow-sm border border-stone-100 hover:shadow-md transition-all hover:border-[#8d6e63] block">
+                  <h3 className="text-xl font-bold text-[#4a4a4a] mb-1">{job.title}</h3>
+                  <div className="flex gap-4 text-sm text-gray-500">
+                    <span>📍 {job.location}</span>
+                    <span>💰 {job.salary}</span>
+                    <span>🕒 {job.created_at ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ja }) : ''}</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="text-center py-8 bg-white rounded border border-dashed text-gray-400">
+                現在、新着の求人はありません。
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="bg-stone-800 text-white rounded-2xl p-10 text-center">
+          <h2 className="text-2xl font-bold mb-4">あなたの知識、共有しませんか？</h2>
+          <p className="mb-6 opacity-80">「学びの広場」では、発掘現場でのノウハウや体験談を募集しています。</p>
+          <Link href="/learning" className="inline-block bg-[#8d6e63] text-white px-8 py-3 rounded-full font-bold hover:bg-[#7b5e55] transition-colors">
+            学びの広場へ行く
+          </Link>
+        </section>
+
       </main>
+
+      {/* フッター */}
+      <footer className="bg-[#4a4a4a] text-white p-8 text-center mt-10">
+        <p>&copy; 2025 発掘Mate Project. All rights reserved.</p>
+      </footer>
     </div>
-  );
+  )
 }
