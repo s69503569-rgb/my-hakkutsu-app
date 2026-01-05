@@ -236,7 +236,7 @@ export default function AuthPage() {
                         ) : (
                             <form onSubmit={handleVerifyOtp} className="space-y-4">
                                 <div className="text-sm text-gray-600 mb-4">
-                                    {otpEmail} 宛に送信された6桁のコードを入力してください。
+                                    {otpEmail} 宛に送信された8桁のコードを入力してください。
                                 </div>
 
                                 <div>
